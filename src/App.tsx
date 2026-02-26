@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import type { ReactNode } from 'react';
-import { Plus, Book, Settings as SettingsIcon } from 'lucide-react';
+import { Plus, Book, Settings as SettingsIcon, Wheat } from 'lucide-react';
 import { AnimatePresence, motion, LayoutGroup } from 'framer-motion';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Home } from './pages/Home';
-import { LogEntry } from './pages/LogEntry';
-import { LoafDetail } from './pages/LoafDetail';
-import { Settings } from './pages/Settings';
+import { ToastContainer } from './components/Toast';
+const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
+const LogEntry = lazy(() => import('./pages/LogEntry').then(m => ({ default: m.LogEntry })));
+const LoafDetail = lazy(() => import('./pages/LoafDetail').then(m => ({ default: m.LoafDetail })));
+const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
 import { useJournalStore } from './store/useJournalStore';
 import { useSettingsStore } from './store/useSettingsStore';
 
@@ -58,7 +59,18 @@ const AppContent = () => {
         document.documentElement.setAttribute('data-theme', themeColor);
     }, [themeMode, themeColor]);
 
-    if (!isLoaded) return <div className="min-h-screen bg-journal-bg dark:bg-ink-main flex items-center justify-center font-serif text-ink-muted dark:text-journal-bg">Waking the starter...</div>;
+    if (!isLoaded) return (
+        <div className="min-h-screen bg-journal-bg dark:bg-[#1C1B19] flex items-center justify-center">
+            <motion.div
+                animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
+                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                className="flex flex-col items-center gap-4 text-ink-muted dark:text-[#E8E6E1]/50"
+            >
+                <Wheat className="w-8 h-8 opacity-50" />
+                <span className="font-serif italic text-sm tracking-widest uppercase">Waking the starter...</span>
+            </motion.div>
+        </div>
+    );
 
     return (
         <div className="min-h-screen bg-journal-bg dark:bg-[#1C1B19] text-ink-main dark:text-[#E8E6E1] font-sans selection:bg-crust selection:text-white pb-32 relative overflow-hidden transition-colors duration-500">
@@ -130,16 +142,26 @@ const AppContent = () => {
                 </motion.div>
             </motion.div>
 
+            <ToastContainer />
 
             <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-36 relative z-10 min-h-[80vh]">
-                <AnimatePresence mode="wait">
-                    <Routes location={location} key={location.pathname}>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/log" element={<LogEntry />} />
-                        <Route path="/settings" element={<Settings />} />
-                        <Route path="/loaf/:id" element={<LoafDetail />} />
-                    </Routes>
-                </AnimatePresence>
+                <Suspense fallback={
+                    <div className="flex h-[40vh] items-center justify-center">
+                        <motion.div animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }} className="flex flex-col items-center gap-4 text-ink-muted">
+                            <Wheat className="w-8 h-8 opacity-50" />
+                            <span className="font-serif italic text-sm tracking-widest uppercase">Fetching dough...</span>
+                        </motion.div>
+                    </div>
+                }>
+                    <AnimatePresence mode="wait">
+                        <Routes location={location} key={location.pathname}>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/log" element={<LogEntry />} />
+                            <Route path="/settings" element={<Settings />} />
+                            <Route path="/loaf/:id" element={<LoafDetail />} />
+                        </Routes>
+                    </AnimatePresence>
+                </Suspense>
             </main>
 
         </div >

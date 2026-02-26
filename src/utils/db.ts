@@ -1,50 +1,67 @@
-import { openDB } from 'idb';
-import type { DBSchema, IDBPDatabase } from 'idb';
-import type { LoafRecord } from '../types';
+import Dexie, { type Table } from 'dexie';
+import type { LoafRecord, StarterLogRecord } from '../types';
 
-interface SourdoughDB extends DBSchema {
-    loaves: {
-        key: string;
-        value: LoafRecord;
-        indexes: { 'by-date': number };
-    };
-}
+export class SourdoughDatabase extends Dexie {
+    loaves!: Table<LoafRecord, string>;
+    starterLogs!: Table<StarterLogRecord, string>;
 
-const DB_NAME = 'WildYeast_DB';
-const DB_VERSION = 1;
-
-let dbPromise: Promise<IDBPDatabase<SourdoughDB>> | null = null;
-
-export const initDB = async () => {
-    if (!dbPromise) {
-        dbPromise = openDB<SourdoughDB>(DB_NAME, DB_VERSION, {
-            upgrade(db) {
-                const store = db.createObjectStore('loaves', { keyPath: 'id' });
-                store.createIndex('by-date', 'createdAt');
-            },
+    constructor() {
+        super('WildYeast_DB');
+        // We must preserve existing stores and bump version if adding new tables
+        this.version(2).stores({
+            loaves: 'id, createdAt',
+            starterLogs: 'id, createdAt'
         });
     }
-    return dbPromise;
-};
+}
+
+const db = new SourdoughDatabase();
+
+export const initDB = async () => db;
 
 export const saveLoaf = async (loaf: LoafRecord) => {
-    const db = await initDB();
-    await db.put('loaves', loaf);
+    await db.loaves.put(loaf);
 };
 
 export const getLoaves = async (): Promise<LoafRecord[]> => {
-    const db = await initDB();
-    // Get all loaves and sort by createdAt descending
-    const allLoaves = await db.getAllFromIndex('loaves', 'by-date');
-    return allLoaves.sort((a, b) => b.createdAt - a.createdAt);
+    const allLoaves = await db.loaves.orderBy('createdAt').reverse().toArray();
+    return allLoaves;
 };
 
 export const deleteLoaf = async (id: string) => {
-    const db = await initDB();
-    await db.delete('loaves', id);
+    await db.loaves.delete(id);
 };
 
 export const clearDatabase = async () => {
-    const db = await initDB();
-    await db.clear('loaves');
+    await db.loaves.clear();
+    await db.starterLogs.clear();
+};
+
+export const saveStarterLog = async (log: StarterLogRecord) => {
+    await db.starterLogs.put(log);
+};
+
+export const getStarterLogs = async (): Promise<StarterLogRecord[]> => {
+    return await db.starterLogs.orderBy('createdAt').reverse().toArray();
+};
+
+export const exportDatabase = async (): Promise<string> => {
+    const loaves = await db.loaves.toArray();
+    const starterLogs = await db.starterLogs.toArray();
+    const data = { loaves, starterLogs, exportDate: new Date().toISOString() };
+    return JSON.stringify(data);
+};
+
+export const importDatabase = async (jsonString: string): Promise<void> => {
+    const data = JSON.parse(jsonString);
+    if (!data.loaves) throw new Error("Invalid export format");
+
+    await db.transaction('rw', db.loaves, db.starterLogs, async () => {
+        if (data.loaves && Array.isArray(data.loaves)) {
+            await db.loaves.bulkPut(data.loaves);
+        }
+        if (data.starterLogs && Array.isArray(data.starterLogs)) {
+            await db.starterLogs.bulkPut(data.starterLogs);
+        }
+    });
 };

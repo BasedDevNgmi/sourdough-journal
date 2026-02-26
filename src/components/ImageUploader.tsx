@@ -10,12 +10,21 @@ interface ImageUploaderProps {
 
 const ImageUploader = ({ images, onChange, maxUploads = 3 }: ImageUploaderProps) => {
     const onDrop = useCallback((acceptedFiles: File[]) => {
-        // Convert files to object URLs for local display
-        const newImages = acceptedFiles.map(file => URL.createObjectURL(file));
+        // Convert files to base64 data URLs for persistence
+        const promises = acceptedFiles.map(file => {
+            return new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        });
 
-        // Append but respect max uploads
-        const combined = [...images, ...newImages].slice(0, maxUploads);
-        onChange(combined);
+        Promise.all(promises).then(newImages => {
+            // Append but respect max uploads
+            const combined = [...images, ...newImages].slice(0, maxUploads);
+            onChange(combined);
+        });
     }, [images, onChange, maxUploads]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -28,8 +37,6 @@ const ImageUploader = ({ images, onChange, maxUploads = 3 }: ImageUploaderProps)
     });
 
     const removeImage = (indexToRemove: number) => {
-        // Revoke the object URL to avoid memory leaks
-        URL.revokeObjectURL(images[indexToRemove]);
         onChange(images.filter((_, idx) => idx !== indexToRemove));
     };
 

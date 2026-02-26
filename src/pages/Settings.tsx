@@ -1,9 +1,24 @@
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { Download, Upload, FlaskConical } from 'lucide-react';
+import { exportDatabase, importDatabase, saveStarterLog } from '../utils/db';
 import { useSettingsStore } from '../store/useSettingsStore';
+import { useToastStore } from '../store/useToastStore';
 import type { ThemeColor, ThemeMode } from '../store/useSettingsStore';
+
+const pageTransition = {
+    initial: { opacity: 0, y: 40, filter: 'blur(10px)' },
+    animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
+    exit: { opacity: 0, y: -40, filter: 'blur(10px)' },
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }
+};
 
 export const Settings = () => {
     const { bakerName, setBakerName, themeColor, setThemeColor, themeMode, setThemeMode } = useSettingsStore();
+    const { addToast, addConfirm } = useToastStore();
+
+    const [starterRatio, setStarterRatio] = useState('1:1:1');
+    const [starterAmount, setStarterAmount] = useState(25);
 
     const themes: { id: ThemeColor, name: string }[] = [
         { id: 'original', name: 'Tartine Classic (Charcoal)' },
@@ -21,18 +36,15 @@ export const Settings = () => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full space-y-12"
+            {...pageTransition}
+            className="w-full space-y-16"
         >
             <div className="border-b border-ink-main/20 pb-8">
                 <h2 className="text-5xl sm:text-6xl font-serif font-bold text-ink-main tracking-tighter mb-4">The Lab</h2>
                 <p className="text-ink-muted text-xl font-serif italic">Personalize your proofing environment.</p>
             </div>
 
-            <div className="glass-card p-8 sm:p-12 rounded-[2.5rem] space-y-12">
+            <div className="glass-card p-10 sm:p-16 rounded-[2.5rem] space-y-16">
                 <div>
                     <label className="block text-sm font-bold text-ink-muted mb-3 uppercase tracking-wider text-xs">Baker's Moniker</label>
                     <input
@@ -76,14 +88,119 @@ export const Settings = () => {
                 </div>
 
                 <div className="pt-8 border-t border-journal-border/50">
+                    <label className="block text-sm font-bold text-ink-muted mb-6 uppercase tracking-wider text-xs flex items-center gap-2">
+                        <FlaskConical className="w-4 h-4 text-sage-dark" />
+                        Starter Maintenance
+                    </label>
+                    <div className="bg-journal-bg/30 p-6 rounded-2xl border border-journal-border space-y-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div className="col-span-2 sm:col-span-1">
+                                <label className="block text-xs uppercase text-ink-muted mb-1">Ratio</label>
+                                <input type="text" value={starterRatio} onChange={e => setStarterRatio(e.target.value)} placeholder="1:2:2" className="w-full p-2.5 rounded-lg bg-white dark:bg-journal-card border border-journal-border font-serif text-center" />
+                            </div>
+                            <div>
+                                <label className="block text-xs uppercase text-ink-muted mb-1">Starter (g)</label>
+                                <input type="number" value={starterAmount} onChange={e => setStarterAmount(Number(e.target.value))} className="w-full p-2.5 rounded-lg bg-white dark:bg-journal-card border border-journal-border font-serif text-center" />
+                            </div>
+                            <div>
+                                <label className="block text-xs uppercase text-ink-muted mb-1">Flour (g)</label>
+                                <input type="number" value={starterAmount * parseInt(starterRatio.split(':')[1] || '1')} readOnly className="w-full p-2.5 rounded-lg bg-white/50 dark:bg-journal-card/50 border border-journal-border font-serif text-center text-ink-muted" />
+                            </div>
+                            <div>
+                                <label className="block text-xs uppercase text-ink-muted mb-1">Water (g)</label>
+                                <input type="number" value={starterAmount * parseInt(starterRatio.split(':')[2] || '1')} readOnly className="w-full p-2.5 rounded-lg bg-white/50 dark:bg-journal-card/50 border border-journal-border font-serif text-center text-ink-muted" />
+                            </div>
+                        </div>
+                        <button
+                            onClick={async () => {
+                                const parts = starterRatio.split(':').map(Number);
+                                if (parts.length === 3) {
+                                    await saveStarterLog({
+                                        id: crypto.randomUUID(),
+                                        createdAt: Date.now(),
+                                        feedRatio: starterRatio,
+                                        starterAmountG: starterAmount,
+                                        flourFedG: starterAmount * parts[1],
+                                        waterFedG: starterAmount * parts[2],
+                                        notes: ''
+                                    });
+                                    if (navigator.vibrate) navigator.vibrate(20);
+                                    addToast('Starter feeding logged successfully.', 'success');
+                                } else {
+                                    addToast('Invalid ratio format. Use format like 1:1:1', 'error');
+                                }
+                            }}
+                            className="w-full py-3 rounded-xl bg-ink-main text-journal-bg font-serif font-bold tracking-wide hover:bg-crust transition-colors shadow-sm"
+                        >
+                            Log Feeding
+                        </button>
+                    </div>
+                </div>
+
+                <div className="pt-8 border-t border-journal-border/50">
+                    <label className="block text-sm font-bold text-ink-muted mb-4 uppercase tracking-wider text-xs">Data Management</label>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <button
+                            onClick={async () => {
+                                try {
+                                    const json = await exportDatabase();
+                                    const blob = new Blob([json], { type: 'application/json' });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = `sourdough-journal-export-${new Date().toISOString().split('T')[0]}.json`;
+                                    a.click();
+                                    URL.revokeObjectURL(url);
+                                    addToast('Archive exported successfully.', 'success');
+                                } catch (e) {
+                                    console.error(e);
+                                    addToast("Failed to export data.", 'error');
+                                }
+                            }}
+                            className="flex-1 py-4 px-6 rounded-2xl border-2 border-journal-border bg-white dark:bg-journal-card text-ink-main dark:text-[#E8E6E1] hover:border-sage hover:text-sage-dark transition-all flex items-center justify-center gap-2 font-serif font-bold shadow-sm"
+                        >
+                            <Download className="w-5 h-5" />
+                            Export Archives (JSON)
+                        </button>
+
+                        <div className="flex-1 relative">
+                            <input
+                                type="file"
+                                accept=".json"
+                                onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+
+                                    try {
+                                        const text = await file.text();
+                                        await importDatabase(text);
+                                        addToast('Import successful! Reloading...', 'success');
+                                        if (navigator.vibrate) navigator.vibrate([20, 50, 20]);
+                                        setTimeout(() => window.location.reload(), 1500);
+                                    } catch (err: any) {
+                                        console.error(err);
+                                        addToast(err.message || 'Failed to import data', 'error');
+                                    }
+                                }}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            />
+                            <div className="h-full py-4 px-6 rounded-2xl border-2 border-journal-border bg-white dark:bg-journal-card text-ink-main dark:text-[#E8E6E1] hover:border-crust hover:text-crust transition-all flex items-center justify-center gap-2 font-serif font-bold shadow-sm pointer-events-none">
+                                <Upload className="w-5 h-5" />
+                                Import Archives
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="pt-8 border-t border-journal-border/50">
                     <label className="block text-sm font-bold text-red-900/40 dark:text-red-400/40 mb-4 uppercase tracking-wider text-xs">Danger Zone</label>
                     <button
                         onClick={async () => {
-                            if (window.confirm("Are you sure you want to wipe all your journal entries? This will re-seed the initial mock data.")) {
+                            addConfirm("Are you sure you want to wipe all your journal entries?", async () => {
                                 const { useJournalStore } = await import('../store/useJournalStore');
                                 await useJournalStore.getState().clearAllLoaves();
                                 window.location.href = '/';
-                            }
+                            });
                         }}
                         className="py-3 px-6 rounded-2xl border-2 border-red-900/10 dark:border-red-400/10 text-red-900/60 dark:text-red-400/60 hover:bg-red-50 dark:hover:bg-red-900/10 hover:border-red-900/30 dark:hover:border-red-400/30 transition-all font-sans text-sm tracking-widest uppercase font-semibold w-full sm:w-auto"
                     >

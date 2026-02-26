@@ -29,6 +29,16 @@ export interface FermentationTimeline {
     bakeTempC: number;
 }
 
+export interface StarterLogRecord {
+    id: string;
+    createdAt: number;
+    feedRatio: string;
+    starterAmountG: number;
+    flourFedG: number;
+    waterFedG: number;
+    notes: string;
+}
+
 export interface LoafRecord {
     id: string;
     name: string;

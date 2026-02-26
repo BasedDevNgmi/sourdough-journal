@@ -31,7 +31,7 @@ export default {
       },
       fontFamily: {
         serif: ['"Cormorant Garamond"', '"Playfair Display"', 'Georgia', 'serif'], // Elegant serifs
-        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+        sans: ['"SF Pro Display"', '"SF Pro Text"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         'subtle': '0 4px 20px rgba(0,0,0,0.03)',

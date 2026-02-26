@@ -24,9 +24,9 @@
 
   .dark[data-theme="original"],
   .dark {
-    --color-journal-bg: 26 26 26;
-    --color-journal-card: 34 34 34;
-    --color-journal-border: 51 51 51;
+    --color-journal-bg: 0 0 0;
+    --color-journal-card: 28 28 30;
+    --color-journal-border: 56 56 58;
     --color-ink-main: 249 248 246;
     --color-ink-muted: 163 160 153;
     --color-ink-faint: 107 104 98;
