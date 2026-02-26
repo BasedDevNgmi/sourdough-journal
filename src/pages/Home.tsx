@@ -23,7 +23,7 @@ export const Home = () => {
                     <motion.h2 layoutId="page-title" className="text-6xl sm:text-7xl font-serif font-bold text-ink-main tracking-tighter leading-none mb-4">
                         The Breadbox
                     </motion.h2>
-                    <p className="text-ink-muted text-xl font-serif italic">A chronicle of flour, water, temperature, and time.</p>
+                    <p className="text-ink-muted text-xl font-serif italic">A chronicle of flour, water, temperature, time, and occasionally, tears.</p>
                 </div>
 
                 {loaves.length > 0 && (
@@ -46,8 +46,8 @@ export const Home = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center py-32 border border-journal-border/80 rounded-[3rem] bg-white/40"
                 >
-                    <h3 className="text-3xl font-serif text-ink-main mb-4 tracking-tight">The breadbox is empty</h3>
-                    <p className="text-ink-muted text-xl font-serif italic mb-8">Your starter is waiting.</p>
+                    <h3 className="text-3xl font-serif text-ink-main mb-4 tracking-tight">The breadbox is empty.</h3>
+                    <p className="text-ink-muted text-xl font-serif italic mb-8">Let's get this bread. Your starter is hungry.</p>
                 </motion.div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 items-start">

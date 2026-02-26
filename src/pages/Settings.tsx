@@ -14,9 +14,9 @@ export const Settings = () => {
     ];
 
     const modes: { id: ThemeMode, name: string }[] = [
-        { id: 'light', name: 'Light' },
-        { id: 'dark', name: 'Dark' },
-        { id: 'system', name: 'System' },
+        { id: 'light', name: 'Oven Light' },
+        { id: 'dark', name: 'Proof Box' },
+        { id: 'system', name: 'Starter (Auto)' },
     ];
 
     return (
@@ -28,8 +28,8 @@ export const Settings = () => {
             className="w-full space-y-12"
         >
             <div className="border-b border-ink-main/20 pb-8">
-                <h2 className="text-5xl sm:text-6xl font-serif font-bold text-ink-main tracking-tighter mb-4">Settings</h2>
-                <p className="text-ink-muted text-xl font-serif italic">Personalize the proofing environment.</p>
+                <h2 className="text-5xl sm:text-6xl font-serif font-bold text-ink-main tracking-tighter mb-4">The Lab</h2>
+                <p className="text-ink-muted text-xl font-serif italic">Personalize your proofing environment.</p>
             </div>
 
             <div className="glass-card p-8 sm:p-12 rounded-[2.5rem] space-y-12">
@@ -87,7 +87,7 @@ export const Settings = () => {
                         }}
                         className="py-3 px-6 rounded-2xl border-2 border-red-900/10 dark:border-red-400/10 text-red-900/60 dark:text-red-400/60 hover:bg-red-50 dark:hover:bg-red-900/10 hover:border-red-900/30 dark:hover:border-red-400/30 transition-all font-sans text-sm tracking-widest uppercase font-semibold w-full sm:w-auto"
                     >
-                        Wipe Journal & Reset Demo
+                        Scrap Dough & Reset Demo
                     </button>
                 </div>
             </div>

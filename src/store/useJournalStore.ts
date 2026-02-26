@@ -41,7 +41,7 @@ export const useJournalStore = create<JournalState>((set, get) => ({
                         starter: { peakStatus: 'Peak', feedingRatio: '1:4:4' },
                         ratings: { crumb: 5, crust: 5, ovenSpring: 4, flavor: 5, overall: 5 },
                         notes: 'An absolute revelation. The extended autolyse yielded a deeply extensible dough. The blisters on the crust are profound, and the flavor profile is wildly complex—deep caramel notes with a sharp lactic tang.',
-                        images: ['/mock-country.png']
+                        images: ['https://images.unsplash.com/photo-1589367920969-ab8e050bf0ef?q=80&w=800&auto=format&fit=crop']
                     },
                     {
                         id: 'seed-2',
@@ -54,7 +54,7 @@ export const useJournalStore = create<JournalState>((set, get) => ({
                         starter: { peakStatus: 'Falling', feedingRatio: '1:1:1' },
                         ratings: { crumb: 4, crust: 4, ovenSpring: 3, flavor: 5, overall: 4 },
                         notes: 'Laminated toasted walnuts during the second fold. The dough structure suffered slightly from the heavy inclusions, resulting in a tighter crumb, but the rustic flavor is incredible. Deep purple hue from the walnuts.',
-                        images: ['/mock-rye.png']
+                        images: ['https://images.unsplash.com/photo-1542826438-bd32f43d626f?q=80&w=800&auto=format&fit=crop']
                     }
                 ];
                 for (const mock of mockLoaves) {
@@ -62,6 +62,28 @@ export const useJournalStore = create<JournalState>((set, get) => ({
                 }
                 data = await getLoaves();
             }
+
+            // Patch any existing broken mock data URLs in the user's IndexedDB
+            let needsSave = false;
+            const patchedData = data.map(loaf => {
+                if (loaf.id === 'seed-1' && loaf.images?.[0] === '/mock-country.png') {
+                    needsSave = true;
+                    return { ...loaf, images: ['https://images.unsplash.com/photo-1589367920969-ab8e050bf0ef?q=80&w=800&auto=format&fit=crop'] };
+                }
+                if (loaf.id === 'seed-2' && loaf.images?.[0] === '/mock-rye.png') {
+                    needsSave = true;
+                    return { ...loaf, images: ['https://images.unsplash.com/photo-1542826438-bd32f43d626f?q=80&w=800&auto=format&fit=crop'] };
+                }
+                return loaf;
+            });
+
+            if (needsSave) {
+                for (const loaf of patchedData) {
+                    await saveLoaf(loaf);
+                }
+                data = patchedData;
+            }
+
             set({ loaves: data, isLoaded: true });
         } catch (error) {
             console.error("Failed to load loaves from IndexedDB", error);

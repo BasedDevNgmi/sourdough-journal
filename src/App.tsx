@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Plus } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import type { ReactNode } from 'react';
+import { Plus, Book, Settings as SettingsIcon } from 'lucide-react';
+import { AnimatePresence, motion, LayoutGroup } from 'framer-motion';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Home } from './pages/Home';
 import { LogEntry } from './pages/LogEntry';
@@ -8,6 +9,20 @@ import { LoafDetail } from './pages/LoafDetail';
 import { Settings } from './pages/Settings';
 import { useJournalStore } from './store/useJournalStore';
 import { useSettingsStore } from './store/useSettingsStore';
+
+const NavItem = ({ to, label, active, icon }: { to: string, label: string, active: boolean, icon: ReactNode }) => (
+    <Link to={to} className={`relative flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 rounded-full transition-all duration-300 z-10 group outline-none ${active ? 'text-journal-bg dark:text-[#1C1B19]' : 'text-ink-muted dark:text-white/50 hover:text-ink-main dark:hover:text-white'}`}>
+        {active && (
+            <motion.div
+                layoutId="nav-active-pill"
+                className="absolute inset-0 bg-ink-main dark:bg-[#E8E6E1] rounded-full z-[-1]"
+                transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.8 }}
+            />
+        )}
+        <div className={`transition-transform duration-300 ${active ? 'scale-110' : 'group-hover:scale-110'}`}>{icon}</div>
+        <span className={`relative z-10 font-sans text-xs sm:text-sm tracking-[0.2em] uppercase font-bold`}>{label}</span>
+    </Link>
+);
 
 // We need a wrapper component to use location hooks
 const AppContent = () => {
@@ -52,72 +67,66 @@ const AppContent = () => {
             <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-sage/10 dark:bg-sage/5 rounded-full blur-[140px] mix-blend-multiply dark:mix-blend-lighten pointer-events-none" />
             <div className="absolute inset-0 texture-overlay pointer-events-none" />
 
-            {/* Header / Global Navigation */}
+            {/* The Dynamic Breadboard (Nav) */}
             <motion.div
-                layout
-                initial={false}
-                animate={{
-                    y: 0,
-                    width: isScrolled ? "100%" : "auto",
-                    borderRadius: isScrolled ? "0px" : "9999px",
-                }}
-                transition={{
-                    type: "spring",
-                    stiffness: 250,
-                    damping: 35,
-                    mass: 0.8
-                }}
-                className={`fixed z-50 flex justify-center left-0 right-0 mx-auto
-                    /* Mobile: Always full width footer at bottom */
-                    bottom-0 w-full rounded-none
-                    /* Desktop: Floating Pill -> Sticky Header */
-                    sm:bottom-auto sm:w-auto
-                    ${isScrolled ? 'sm:top-0' : 'sm:top-6'}
+                className={`fixed z-[100] left-0 right-0 mx-auto flex justify-center pointer-events-none
+                    bottom-6 sm:bottom-auto sm:top-8
                 `}
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.1 }}
             >
                 <motion.div
                     layout
-                    className={`bg-journal-bg/90 dark:bg-[#1C1B19]/90 backdrop-blur-xl flex items-center justify-between transition-colors duration-500 overflow-hidden ${isScrolled
-                        ? 'w-full border-t sm:border-t-0 sm:border-b border-journal-border shadow-sm px-6 py-4'
-                        : 'w-full sm:w-auto border-t sm:border-t-0 sm:border border-journal-border sm:shadow-lg sm:dark:shadow-[0_8px_30px_rgba(255,255,255,0.05)] px-6 sm:px-8 py-4 sm:py-3 sm:rounded-full'
-                        }`}
+                    className={`pointer-events-auto flex items-center p-2 rounded-full backdrop-blur-2xl bg-white/70 dark:bg-[#1C1B19]/70 border border-white/50 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-500`}
                 >
-                    <motion.div layout className={`flex items-center justify-between w-full mx-auto transition-all duration-500 ${isScrolled ? 'max-w-5xl' : 'max-w-max sm:gap-10'}`}>
-                        <Link to="/" className={`flex items-center gap-3 cursor-pointer group`}>
-                            <motion.div layout="position" className="w-8 h-8 rounded-full border-2 border-crust flex items-center justify-center group-hover:bg-crust transition-all duration-300 flex-shrink-0">
-                                <div className="w-2 h-2 rounded-full bg-crust group-hover:bg-white transition-all duration-300" />
-                            </motion.div>
-                            <AnimatePresence>
-                                {!isScrolled && (
-                                    <motion.h1
-                                        layout="position"
-                                        initial={{ opacity: 0, width: 0 }}
-                                        animate={{ opacity: 1, width: "auto" }}
-                                        exit={{ opacity: 0, width: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="font-serif font-bold tracking-tight text-ink-main dark:text-[#E8E6E1] group-hover:text-ink-muted dark:group-hover:text-white/60 transition-colors duration-500 whitespace-nowrap overflow-hidden hidden sm:block text-xl"
-                                    >
-                                        Proof.
-                                    </motion.h1>
-                                )}
-                            </AnimatePresence>
-                        </Link>
+                    <Link to="/" className="flex items-center pl-4 pr-3 sm:pr-6 cursor-pointer group outline-none">
+                        <motion.div layout="position" className="w-8 h-8 rounded-full border-[3px] border-crust flex items-center justify-center group-hover:bg-crust transition-all duration-300 flex-shrink-0 relative overflow-hidden">
+                            <motion.div
+                                className="w-2.5 h-2.5 rounded-full bg-crust group-hover:bg-white transition-all duration-300"
+                                animate={{ scale: [1, 1.2, 1] }}
+                                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                            />
+                        </motion.div>
+                        <AnimatePresence>
+                            {!isScrolled && (
+                                <motion.h1
+                                    layout="position"
+                                    initial={{ opacity: 0, width: 0, marginLeft: 0 }}
+                                    animate={{ opacity: 1, width: "auto", marginLeft: 12 }}
+                                    exit={{ opacity: 0, width: 0, marginLeft: 0 }}
+                                    transition={{ duration: 0.3, ease: "circInOut" }}
+                                    className="font-serif tracking-tight text-ink-main dark:text-[#E8E6E1] group-hover:text-crust transition-colors duration-300 hidden sm:block text-xl font-black italic whitespace-nowrap overflow-hidden pr-2"
+                                >
+                                    Proof.
+                                </motion.h1>
+                            )}
+                        </AnimatePresence>
+                    </Link>
 
-                        <nav className={`flex items-center font-sans text-sm tracking-widest uppercase font-medium ${isScrolled ? 'gap-6 sm:gap-8' : 'justify-between w-full sm:w-auto gap-4 sm:gap-6'}`}>
-                            <Link to="/" className={`transition-colors whitespace-nowrap ${location.pathname === '/' ? 'text-crust border-b-2 border-crust pb-0.5' : 'text-ink-muted dark:text-white/40 hover:text-ink-main dark:hover:text-white'}`}>
-                                Logbook
-                            </Link>
-                            <Link to="/settings" className={`transition-colors whitespace-nowrap ${location.pathname === '/settings' ? 'text-crust border-b-2 border-crust pb-0.5' : 'text-ink-muted dark:text-white/40 hover:text-ink-main dark:hover:text-white'}`}>
-                                Settings
-                            </Link>
-                            <Link to="/log" className={`flex items-center justify-center gap-2 shadow-sm hover:opacity-90 whitespace-nowrap overflow-hidden transition-all duration-300 ${isScrolled
-                                ? 'px-5 py-2 rounded-full bg-crust text-white'
-                                : 'px-5 py-2 rounded-full bg-crust text-white sm:bg-ink-main sm:dark:bg-[#E8E6E1] sm:text-journal-bg sm:dark:text-[#1C1B19]'
-                                }`}>
-                                <Plus className="w-4 h-4 flex-shrink-0" /> <span className="hidden sm:inline">Log</span>
-                            </Link>
-                        </nav>
-                    </motion.div>
+                    <div className="w-px h-8 bg-ink-main/10 dark:bg-white/10 mx-1 sm:mx-2" />
+
+                    <nav className="flex items-center gap-1 sm:gap-2 pr-1 sm:pr-2">
+                        <LayoutGroup>
+                            <NavItem to="/" label="Archive" icon={<Book className="w-4 h-4 sm:w-4 sm:h-4" />} active={location.pathname === '/' || location.pathname.startsWith('/loaf')} />
+                            <NavItem to="/settings" label="Lab" icon={<SettingsIcon className="w-4 h-4 sm:w-4 sm:h-4" />} active={location.pathname === '/settings'} />
+                        </LayoutGroup>
+
+                        <div className="w-px h-8 bg-ink-main/10 dark:bg-white/10 mx-1 sm:mx-2" />
+
+                        <Link to="/log" className="relative group overflow-hidden px-4 py-2.5 sm:px-6 sm:py-3 rounded-full bg-crust text-white shadow-lg hover:shadow-crust/40 hover:-translate-y-0.5 transition-all duration-300 active:scale-95 outline-none">
+                            <span className="relative z-10 flex items-center gap-2">
+                                <Plus className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:rotate-90" />
+                                <span className="hidden sm:inline font-sans text-xs sm:text-sm tracking-[0.1em] uppercase font-bold text-white">Bake</span>
+                            </span>
+                            {/* Animated shiny overlay */}
+                            <motion.div
+                                className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
+                                animate={{ translateX: ['-100%', '200%'] }}
+                                transition={{ repeat: Infinity, duration: 4, delay: 1, ease: 'linear' }}
+                            />
+                        </Link>
+                    </nav>
                 </motion.div>
             </motion.div>
 
