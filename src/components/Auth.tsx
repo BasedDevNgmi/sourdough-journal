@@ -100,39 +100,29 @@ export const Auth = ({ onComplete = () => { } }: { onComplete?: () => void }) =>
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="mb-8 text-center flex flex-col items-center"
             >
-                {/* Premium & Funny Dough Face SVG */}
+                {/* Minimal & Elegant Dough / Twist SVG */}
                 <motion.svg
-                    width="80"
-                    height="80"
+                    width="48"
+                    height="48"
                     viewBox="0 0 100 100"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="mb-4 drop-shadow-lg"
-                    whileHover={{ scale: 1.05, rotate: -5 }}
+                    className="mb-4 text-ink-main dark:text-[#E8E6E1] drop-shadow-sm"
+                    whileHover={{ scale: 1.05, rotate: 2 }}
                     transition={{ type: "spring", stiffness: 300, damping: 15 }}
                 >
-                    {/* The Loaf outline */}
-                    <path d="M20,60 C10,60 10,40 25,30 C35,20 65,20 75,30 C90,40 90,60 80,60 C90,75 75,85 50,85 C25,85 10,75 20,60 Z" fill="currentColor" className="text-amber-700/80 dark:text-amber-500/80" />
-
-                    {/* The crust/scoring (smile and wink) */}
-                    {/* Left Eye (Wink) */}
-                    <path d="M35,45 Q40,40 45,45" stroke="#F5F5F0" strokeWidth="4" strokeLinecap="round" className="dark:stroke-[#1C1B19]" />
-
-                    {/* Right Eye (Open) */}
-                    <circle cx="65" cy="45" r="3" fill="#F5F5F0" className="dark:fill-[#1C1B19]" />
-
-                    {/* Smile / Ear scoring */}
-                    <path d="M30,60 Q50,75 70,60" stroke="#F5F5F0" strokeWidth="5" strokeLinecap="round" className="dark:stroke-[#1C1B19]" />
-
-                    {/* Rosy cheeks */}
-                    <circle cx="30" cy="52" r="4" fill="#E8A598" opacity="0.6" />
-                    <circle cx="70" cy="52" r="4" fill="#E8A598" opacity="0.6" />
+                    {/* Minimal outline of a sourdough boule */}
+                    <path d="M15,60 C10,35 30,20 50,20 C70,20 90,35 85,60 C80,85 20,85 15,60 Z" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="transparent" />
+                    {/* Minimalist elegant scoring (twist/wheat hybrid) */}
+                    <path d="M35,35 Q 50,55 35,75" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="transparent" />
+                    <path d="M65,35 Q 50,55 65,75" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="transparent" />
+                    <path d="M50,25 L50,80" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeDasharray="8 8" />
                 </motion.svg>
 
-                <h1 className="text-5xl sm:text-6xl font-serif font-black italic text-ink-main dark:text-[#E8E6E1] tracking-tighter drop-shadow-md leading-none">
+                <h1 className="text-4xl sm:text-5xl font-serif font-black italic text-ink-main dark:text-[#E8E6E1] tracking-tighter drop-shadow-sm leading-none">
                     Proof.
                 </h1>
-                <p className="font-sans text-xs tracking-[0.3em] uppercase font-bold text-ink-muted mt-3">
+                <p className="font-sans text-[10px] tracking-[0.4em] uppercase font-bold text-ink-muted mt-4">
                     The Sourdough Journal
                 </p>
             </motion.div>
@@ -141,7 +131,7 @@ export const Auth = ({ onComplete = () => { } }: { onComplete?: () => void }) =>
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ type: "spring", bounce: 0.3, delay: 0.2 }}
-                className="w-full bg-white/60 dark:bg-journal-card/80 backdrop-blur-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-[2.5rem] p-6 sm:p-10 overflow-y-auto relative max-h-[70vh] scrollbar-hide"
+                className="w-full bg-white/60 dark:bg-journal-card/80 backdrop-blur-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-[2.5rem] p-6 sm:p-10 relative overflow-hidden"
             >
 
                 <div className="relative z-10">
