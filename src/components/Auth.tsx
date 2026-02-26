@@ -100,23 +100,42 @@ export const Auth = ({ onComplete = () => { } }: { onComplete?: () => void }) =>
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="mb-8 text-center flex flex-col items-center"
             >
-                {/* Minimal & Elegant Dough / Twist SVG */}
+                {/* Highly Sophisticated Continuous-Line Twist/Wheat Logo */}
                 <motion.svg
-                    width="48"
-                    height="48"
+                    width="56"
+                    height="56"
                     viewBox="0 0 100 100"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="mb-4 text-ink-main dark:text-[#E8E6E1] drop-shadow-sm"
-                    whileHover={{ scale: 1.05, rotate: 2 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                    className="mb-5 text-ink-main dark:text-[#E8E6E1]"
+                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
-                    {/* Minimal outline of a sourdough boule */}
-                    <path d="M15,60 C10,35 30,20 50,20 C70,20 90,35 85,60 C80,85 20,85 15,60 Z" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="transparent" />
-                    {/* Minimalist elegant scoring (twist/wheat hybrid) */}
-                    <path d="M35,35 Q 50,55 35,75" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="transparent" />
-                    <path d="M65,35 Q 50,55 65,75" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="transparent" />
-                    <path d="M50,25 L50,80" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeDasharray="8 8" />
+                    {/* A beautifully flowing, interlocking continuous line that resembles a loaf twist and a wheat stem */}
+                    <path
+                        d="M50,15 C25,15 15,35 30,55 C45,75 50,55 50,85 C50,55 55,75 70,55 C85,35 75,15 50,15 Z"
+                        stroke="currentColor"
+                        strokeWidth="3.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        fill="transparent"
+                        className="drop-shadow-sm opacity-90"
+                    />
+                    <path
+                        d="M50,15 C50,40 30,50 30,75 C30,85 50,85 50,85 C50,85 70,85 70,75 C70,50 50,40 50,15 Z"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        fill="transparent"
+                        className="opacity-60"
+                        strokeDasharray="4 4"
+                    />
+                    {/* Central seed/kernel drop */}
+                    <path
+                        d="M50,35 C48,42 50,48 50,48 C50,48 52,42 50,35 Z"
+                        fill="currentColor"
+                    />
                 </motion.svg>
 
                 <h1 className="text-4xl sm:text-5xl font-serif font-black italic text-ink-main dark:text-[#E8E6E1] tracking-tighter drop-shadow-sm leading-none">
