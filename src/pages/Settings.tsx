@@ -25,7 +25,7 @@ export const Settings = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-3xl mx-auto space-y-12"
+            className="w-full space-y-12"
         >
             <div className="border-b border-ink-main/20 pb-8">
                 <h2 className="text-5xl sm:text-6xl font-serif font-bold text-ink-main tracking-tighter mb-4">Settings</h2>

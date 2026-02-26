@@ -63,9 +63,9 @@ const AppContent = () => {
                 }}
                 transition={{
                     type: "spring",
-                    stiffness: 300,
-                    damping: 30,
-                    mass: 1
+                    stiffness: 250,
+                    damping: 35,
+                    mass: 0.8
                 }}
                 className={`fixed z-50 flex justify-center left-0 right-0 mx-auto
                     /* Mobile: Always full width footer at bottom */
@@ -75,29 +75,35 @@ const AppContent = () => {
                     ${isScrolled ? 'sm:top-0' : 'sm:top-6'}
                 `}
             >
-                <div className={`bg-journal-bg/90 dark:bg-[#1C1B19]/90 backdrop-blur-xl flex items-center justify-between w-full h-full transition-colors duration-500 ${isScrolled
-                        ? 'border-t sm:border-t-0 sm:border-b border-journal-border shadow-sm px-6 py-4'
-                        : 'border-t sm:border-t-0 sm:border border-journal-border sm:shadow-[0_8px_30px_rgb(0,0,0,0.12)] sm:dark:shadow-[0_8px_30px_rgba(255,255,255,0.05)] px-6 py-4 sm:py-3 sm:rounded-full'
-                    }`}>
-                    <div className={`flex items-center justify-between w-full mx-auto transition-all duration-300 ${isScrolled ? 'max-w-5xl' : 'max-w-max sm:gap-12'}`}>
+                <motion.div
+                    layout
+                    className={`bg-journal-bg/90 dark:bg-[#1C1B19]/90 backdrop-blur-xl flex items-center justify-between transition-colors duration-500 overflow-hidden ${isScrolled
+                        ? 'w-full border-t sm:border-t-0 sm:border-b border-journal-border shadow-sm px-6 py-4'
+                        : 'w-full sm:w-auto border-t sm:border-t-0 sm:border border-journal-border sm:shadow-lg sm:dark:shadow-[0_8px_30px_rgba(255,255,255,0.05)] px-6 sm:px-8 py-4 sm:py-3 sm:rounded-full'
+                        }`}
+                >
+                    <motion.div layout className={`flex items-center justify-between w-full mx-auto transition-all duration-500 ${isScrolled ? 'max-w-5xl' : 'max-w-max sm:gap-10'}`}>
                         <Link to="/" className={`flex items-center gap-3 cursor-pointer group`}>
-                            <div className="w-8 h-8 rounded-full border-2 border-crust flex items-center justify-center group-hover:bg-crust transition-all duration-300 flex-shrink-0">
+                            <motion.div layout="position" className="w-8 h-8 rounded-full border-2 border-crust flex items-center justify-center group-hover:bg-crust transition-all duration-300 flex-shrink-0">
                                 <div className="w-2 h-2 rounded-full bg-crust group-hover:bg-white transition-all duration-300" />
-                            </div>
-                            <motion.h1
-                                initial={false}
-                                animate={{
-                                    width: isScrolled ? "auto" : "auto",
-                                    opacity: 1
-                                }}
-                                className={`font-serif font-bold tracking-tight text-ink-main dark:text-[#E8E6E1] group-hover:text-ink-muted dark:group-hover:text-white/60 transition-colors duration-500 whitespace-nowrap overflow-hidden hidden sm:block text-2xl`}
-                            >
-                                Proof.
-                            </motion.h1>
+                            </motion.div>
+                            <AnimatePresence>
+                                {!isScrolled && (
+                                    <motion.h1
+                                        layout="position"
+                                        initial={{ opacity: 0, width: 0 }}
+                                        animate={{ opacity: 1, width: "auto" }}
+                                        exit={{ opacity: 0, width: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="font-serif font-bold tracking-tight text-ink-main dark:text-[#E8E6E1] group-hover:text-ink-muted dark:group-hover:text-white/60 transition-colors duration-500 whitespace-nowrap overflow-hidden hidden sm:block text-xl"
+                                    >
+                                        Proof.
+                                    </motion.h1>
+                                )}
+                            </AnimatePresence>
                         </Link>
 
-                        <nav className={`flex items-center font-sans text-sm tracking-widest uppercase font-medium ${isScrolled ? 'gap-6 sm:gap-8' : 'justify-between w-full sm:w-auto gap-4 sm:gap-6'
-                            }`}>
+                        <nav className={`flex items-center font-sans text-sm tracking-widest uppercase font-medium ${isScrolled ? 'gap-6 sm:gap-8' : 'justify-between w-full sm:w-auto gap-4 sm:gap-6'}`}>
                             <Link to="/" className={`transition-colors whitespace-nowrap ${location.pathname === '/' ? 'text-crust border-b-2 border-crust pb-0.5' : 'text-ink-muted dark:text-white/40 hover:text-ink-main dark:hover:text-white'}`}>
                                 Logbook
                             </Link>
@@ -105,18 +111,18 @@ const AppContent = () => {
                                 Settings
                             </Link>
                             <Link to="/log" className={`flex items-center justify-center gap-2 shadow-sm hover:opacity-90 whitespace-nowrap overflow-hidden transition-all duration-300 ${isScrolled
-                                    ? 'px-5 py-2 rounded-full bg-crust text-white'
-                                    : 'px-5 py-2 rounded-full bg-crust text-white sm:bg-ink-main sm:dark:bg-[#E8E6E1] sm:text-journal-bg sm:dark:text-[#1C1B19]'
+                                ? 'px-5 py-2 rounded-full bg-crust text-white'
+                                : 'px-5 py-2 rounded-full bg-crust text-white sm:bg-ink-main sm:dark:bg-[#E8E6E1] sm:text-journal-bg sm:dark:text-[#1C1B19]'
                                 }`}>
                                 <Plus className="w-4 h-4 flex-shrink-0" /> <span className="hidden sm:inline">Log</span>
                             </Link>
                         </nav>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </motion.div>
 
 
-            <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-36 relative z-10 min-h-[80vh]">
+            <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-36 relative z-10 min-h-[80vh]">
                 <AnimatePresence mode="wait">
                     <Routes location={location} key={location.pathname}>
                         <Route path="/" element={<Home />} />

@@ -20,7 +20,7 @@ export const LoafDetail = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="max-w-4xl mx-auto"
+            className="w-full"
         >
             <button
                 onClick={() => navigate(-1)}

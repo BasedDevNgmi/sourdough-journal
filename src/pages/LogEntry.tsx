@@ -13,7 +13,7 @@ export const LogEntry = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-5xl mx-auto"
+            className="w-full"
         >
             <div className="border-b border-ink-main/20 pb-8 mb-12 flex justify-between items-end">
                 <div>
