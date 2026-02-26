@@ -48,66 +48,84 @@ const BakersMath = ({ data, onChange }: BakersMathProps) => {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between border-b border-journal-bg pb-3 group transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-journal-bg dark:border-journal-border/20 pb-4 group transition-colors gap-2 sm:gap-0">
                     <label className="flex items-center gap-2 text-ink-muted font-medium uppercase tracking-wider text-xs">
                         <Droplets className="w-4 h-4 text-ink-faint hidden sm:block" /> Hydration
                     </label>
-                    <div className="flex items-center gap-2 sm:gap-6">
-                        <div className="flex items-center gap-1 text-ink-faint min-w-[3rem] justify-end">
-                            <span className="font-serif text-lg">{waterStr}</span>
-                            <span className="text-xs">g</span>
+                    <div className="flex items-center gap-2 sm:gap-4 self-end sm:self-auto">
+                        {/* Bi-directional Grams Input */}
+                        <div className="flex items-center gap-1 bg-white dark:bg-journal-border/20 px-3 py-1.5 rounded-xl border border-journal-border shadow-sm focus-within:border-crust focus-within:ring-1 focus-within:ring-crust transition-all">
+                            <input
+                                type="number"
+                                value={waterStr}
+                                onChange={(e) => updateField('waterHydration', (Number(e.target.value) / flour) * 100)}
+                                className="bg-transparent text-right font-serif text-lg text-ink-main w-14 outline-none placeholder:text-ink-faint"
+                            />
+                            <span className="text-sm text-ink-muted font-serif">g</span>
                         </div>
-                        <div className="flex items-center gap-1 bg-sage-light/30 px-3 py-1.5 rounded-xl border border-sage-light">
+                        {/* Percentage Input */}
+                        <div className="flex items-center gap-1 bg-sage-light/30 dark:bg-sage-dark/20 px-3 py-1.5 rounded-xl border border-sage-light dark:border-sage-dark focus-within:border-crust focus-within:ring-1 focus-within:ring-crust transition-all">
                             <input
                                 type="number"
                                 value={waterHydration}
                                 onChange={(e) => updateField('waterHydration', Number(e.target.value))}
-                                className="bg-transparent text-right font-serif text-lg text-sage-dark w-12 outline-none focus:text-ink-main transition-colors"
+                                className="bg-transparent text-right font-serif text-lg text-sage-dark dark:text-sage-light w-12 outline-none transition-colors"
                             />
-                            <span className="text-sage-dark font-serif">%</span>
+                            <span className="text-sage-dark dark:text-sage-light font-serif">%</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between border-b border-journal-bg pb-3 group transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-journal-bg dark:border-journal-border/20 pb-4 group transition-colors gap-2 sm:gap-0">
                     <label className="flex items-center gap-2 text-ink-muted font-medium uppercase tracking-wider text-xs">
                         <Beaker className="w-4 h-4 text-ink-faint hidden sm:block" /> Starter
                     </label>
-                    <div className="flex items-center gap-2 sm:gap-6">
-                        <div className="flex items-center gap-1 text-ink-faint min-w-[3rem] justify-end">
-                            <span className="font-serif text-lg">{starterStr}</span>
-                            <span className="text-xs">g</span>
+                    <div className="flex items-center gap-2 sm:gap-4 self-end sm:self-auto">
+                        <div className="flex items-center gap-1 bg-white dark:bg-journal-border/20 px-3 py-1.5 rounded-xl border border-journal-border shadow-sm focus-within:border-crust focus-within:ring-1 focus-within:ring-crust transition-all">
+                            <input
+                                type="number"
+                                value={starterStr}
+                                onChange={(e) => updateField('starterPercentage', (Number(e.target.value) / flour) * 100)}
+                                className="bg-transparent text-right font-serif text-lg text-ink-main w-14 outline-none placeholder:text-ink-faint"
+                            />
+                            <span className="text-sm text-ink-muted font-serif">g</span>
                         </div>
-                        <div className="flex items-center gap-1 bg-sage-light/30 px-3 py-1.5 rounded-xl border border-sage-light">
+                        <div className="flex items-center gap-1 bg-sage-light/30 dark:bg-sage-dark/20 px-3 py-1.5 rounded-xl border border-sage-light dark:border-sage-dark focus-within:border-crust focus-within:ring-1 focus-within:ring-crust transition-all">
                             <input
                                 type="number"
                                 value={starterPercentage}
                                 onChange={(e) => updateField('starterPercentage', Number(e.target.value))}
-                                className="bg-transparent text-right font-serif text-lg text-sage-dark w-12 outline-none focus:text-ink-main transition-colors"
+                                className="bg-transparent text-right font-serif text-lg text-sage-dark dark:text-sage-light w-12 outline-none transition-colors"
                             />
-                            <span className="text-sage-dark font-serif">%</span>
+                            <span className="text-sage-dark dark:text-sage-light font-serif">%</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between border-b border-journal-bg pb-3 group transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-journal-bg dark:border-journal-border/20 pb-4 group transition-colors gap-2 sm:gap-0">
                     <label className="flex items-center gap-2 text-ink-muted font-medium uppercase tracking-wider text-xs opacity-80">
                         Salt
                     </label>
-                    <div className="flex items-center gap-2 sm:gap-6">
-                        <div className="flex items-center gap-1 text-ink-faint min-w-[3rem] justify-end">
-                            <span className="font-serif text-lg">{saltStr}</span>
-                            <span className="text-xs">g</span>
+                    <div className="flex items-center gap-2 sm:gap-4 self-end sm:self-auto">
+                        <div className="flex items-center gap-1 bg-white dark:bg-journal-border/20 px-3 py-1.5 rounded-xl border border-journal-border shadow-sm focus-within:border-crust focus-within:ring-1 focus-within:ring-crust transition-all">
+                            <input
+                                type="number"
+                                value={saltStr}
+                                step="0.5"
+                                onChange={(e) => updateField('saltPercentage', (Number(e.target.value) / flour) * 100)}
+                                className="bg-transparent text-right font-serif text-lg text-ink-main w-14 outline-none placeholder:text-ink-faint"
+                            />
+                            <span className="text-sm text-ink-muted font-serif">g</span>
                         </div>
-                        <div className="flex items-center gap-1 bg-sage-light/30 px-3 py-1.5 rounded-xl border border-sage-light">
+                        <div className="flex items-center gap-1 bg-sage-light/30 dark:bg-sage-dark/20 px-3 py-1.5 rounded-xl border border-sage-light dark:border-sage-dark focus-within:border-crust focus-within:ring-1 focus-within:ring-crust transition-all">
                             <input
                                 type="number"
                                 value={saltPercentage}
                                 step="0.1"
                                 onChange={(e) => updateField('saltPercentage', Number(e.target.value))}
-                                className="bg-transparent text-right font-serif text-lg text-sage-dark w-12 outline-none focus:text-ink-main transition-colors"
+                                className="bg-transparent text-right font-serif text-lg text-sage-dark dark:text-sage-light w-12 outline-none transition-colors"
                             />
-                            <span className="text-sage-dark font-serif">%</span>
+                            <span className="text-sage-dark dark:text-sage-light font-serif">%</span>
                         </div>
                     </div>
                 </div>

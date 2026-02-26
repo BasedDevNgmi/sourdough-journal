@@ -1,10 +1,163 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+
+  :root,
+  :root[data-theme="original"] {
+    --color-journal-bg: 249 248 246;
+    --color-journal-card: 255 255 255;
+    --color-journal-border: 232 230 225;
+    --color-ink-main: 26 26 26;
+    --color-ink-muted: 90 88 85;
+    --color-ink-faint: 158 156 152;
+    --color-crust-light: 212 163 115;
+    --color-crust: 166 90 42;
+    --color-crust-hover: 140 74 29;
+    --color-sage-light: 235 236 233;
+    --color-sage: 138 154 134;
+    --color-sage-dark: 88 106 83;
+  }
+
+  .dark[data-theme="original"],
+  .dark {
+    --color-journal-bg: 26 26 26;
+    --color-journal-card: 34 34 34;
+    --color-journal-border: 51 51 51;
+    --color-ink-main: 249 248 246;
+    --color-ink-muted: 163 160 153;
+    --color-ink-faint: 107 104 98;
+    --color-crust-light: 193 138 93;
+    --color-crust: 214 122 73;
+    --color-crust-hover: 232 138 90;
+    --color-sage-light: 42 48 39;
+    --color-sage: 107 122 102;
+    --color-sage-dark: 159 175 136;
+  }
+
+  :root[data-theme="matcha"] {
+    --color-journal-bg: 244 247 242;
+    --color-journal-card: 255 255 255;
+    --color-journal-border: 226 232 222;
+    --color-ink-main: 34 48 38;
+    --color-ink-muted: 92 110 97;
+    --color-ink-faint: 150 163 154;
+    --color-crust-light: 142 173 125;
+    --color-crust: 84 123 64;
+    --color-crust-hover: 67 99 50;
+    --color-sage-light: 223 232 211;
+    --color-sage: 116 150 97;
+    --color-sage-dark: 74 99 63;
+  }
+
+  .dark[data-theme="matcha"] {
+    --color-journal-bg: 21 28 23;
+    --color-journal-card: 29 38 31;
+    --color-journal-border: 42 54 46;
+    --color-ink-main: 229 237 231;
+    --color-ink-muted: 155 170 159;
+    --color-ink-faint: 91 104 95;
+    --color-crust-light: 163 201 143;
+    --color-crust: 142 173 125;
+    --color-crust-hover: 160 194 142;
+    --color-sage-light: 34 46 37;
+    --color-sage: 93 122 77;
+    --color-sage-dark: 145 175 128;
+  }
+
+  :root[data-theme="lavender"] {
+    --color-journal-bg: 246 244 248;
+    --color-journal-card: 255 255 255;
+    --color-journal-border: 232 226 238;
+    --color-ink-main: 45 36 54;
+    --color-ink-muted: 104 87 118;
+    --color-ink-faint: 166 154 174;
+    --color-crust-light: 165 131 194;
+    --color-crust: 106 68 140;
+    --color-crust-hover: 91 58 120;
+    --color-sage-light: 231 222 238;
+    --color-sage: 138 100 168;
+    --color-sage-dark: 91 64 115;
+  }
+
+  .dark[data-theme="lavender"] {
+    --color-journal-bg: 26 21 32;
+    --color-journal-card: 35 28 42;
+    --color-journal-border: 48 38 59;
+    --color-ink-main: 234 230 238;
+    --color-ink-muted: 163 150 174;
+    --color-ink-faint: 101 86 115;
+    --color-crust-light: 186 158 212;
+    --color-crust: 165 131 194;
+    --color-crust-hover: 189 156 224;
+    --color-sage-light: 38 29 47;
+    --color-sage: 123 86 153;
+    --color-sage-dark: 176 148 201;
+  }
+
+  :root[data-theme="honey"] {
+    --color-journal-bg: 253 249 242;
+    --color-journal-card: 255 255 255;
+    --color-journal-border: 243 232 213;
+    --color-ink-main: 61 43 18;
+    --color-ink-muted: 133 101 58;
+    --color-ink-faint: 202 176 138;
+    --color-crust-light: 242 193 87;
+    --color-crust: 186 131 22;
+    --color-crust-hover: 158 111 19;
+    --color-sage-light: 246 235 206;
+    --color-sage: 212 155 38;
+    --color-sage-dark: 163 122 32;
+  }
+
+  .dark[data-theme="honey"] {
+    --color-journal-bg: 26 19 8;
+    --color-journal-card: 38 29 16;
+    --color-journal-border: 61 45 20;
+    --color-ink-main: 247 234 208;
+    --color-ink-muted: 192 164 119;
+    --color-ink-faint: 117 85 35;
+    --color-crust-light: 252 218 124;
+    --color-crust: 252 188 60;
+    --color-crust-hover: 252 208 87;
+    --color-sage-light: 42 31 13;
+    --color-sage: 184 133 33;
+    --color-sage-dark: 202 152 40;
+  }
+
+  :root[data-theme="rose"] {
+    --color-journal-bg: 252 244 246;
+    --color-journal-card: 255 255 255;
+    --color-journal-border: 242 225 229;
+    --color-ink-main: 63 28 37;
+    --color-ink-muted: 138 82 96;
+    --color-ink-faint: 205 160 171;
+    --color-crust-light: 224 135 162;
+    --color-crust: 163 51 83;
+    --color-crust-hover: 140 42 70;
+    --color-sage-light: 246 214 222;
+    --color-sage: 198 90 118;
+    --color-sage-dark: 145 39 69;
+  }
+
+  .dark[data-theme="rose"] {
+    --color-journal-bg: 29 16 19;
+    --color-journal-card: 43 24 30;
+    --color-journal-border: 68 36 43;
+    --color-ink-main: 252 239 242;
+    --color-ink-muted: 205 156 173;
+    --color-ink-faint: 122 73 87;
+    --color-crust-light: 238 141 169;
+    --color-crust: 232 106 139;
+    --color-crust-hover: 239 155 186;
+    --color-sage-light: 51 26 33;
+    --color-sage: 176 78 105;
+    --color-sage-dark: 226 93 132;
+  }
+
   body {
     @apply bg-journal-bg text-ink-main font-sans antialiased overflow-x-hidden;
   }
@@ -21,12 +174,26 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-subtle;
+    @apply bg-white border border-journal-border shadow-subtle;
+    /* Removing heavy blurs for a crisp, printed paper feel */
   }
 
-  /* Custom scrollbar for a premium feel */
+  .texture-overlay {
+    position: relative;
+  }
+
+  .texture-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   ::-webkit-scrollbar-track {
@@ -34,10 +201,10 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-ink-faint/30 rounded-full;
+    @apply bg-ink-faint/20 rounded-none;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-ink-muted/50;
+    @apply bg-ink-muted/40;
   }
 }

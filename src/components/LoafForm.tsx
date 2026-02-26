@@ -1,0 +1,210 @@
+import { useState } from 'react';
+import { BookOpen, Star, Thermometer, Clock, Target } from 'lucide-react';
+import BakersMath from './BakersMath';
+import type { BakersMathData } from './BakersMath';
+import ImageUploader from './ImageUploader';
+import { useJournalStore } from '../store/useJournalStore';
+import type { LoafRecord, FlourBlend, FermentationTimeline, LoafRatings } from '../types';
+
+interface LoafFormProps {
+    onComplete: () => void;
+    initialData?: Partial<LoafRecord>;
+    editId?: string;
+}
+
+export const LoafForm = ({ onComplete, initialData, editId }: LoafFormProps) => {
+    const { addLoaf, updateLoaf } = useJournalStore();
+
+    // Form State
+    const [name, setName] = useState(initialData?.name || '');
+    const [images, setImages] = useState<string[]>(initialData?.images || []);
+    const [mathData, setMathData] = useState<BakersMathData>(initialData?.math || {
+        flour: 500,
+        waterHydration: 75,
+        saltPercentage: 2,
+        starterPercentage: 20
+    });
+
+    const [flours] = useState<FlourBlend[]>(initialData?.flours || [
+        { name: 'Bread Flour', percentage: 100 }
+    ]);
+
+    const [timeline, setTimeline] = useState<FermentationTimeline>(initialData?.timeline || {
+        autolyseDurationMins: 60,
+        roomTempC: 22,
+        bulkFermentationHours: 4,
+        bulkDoughTempC: 24,
+        coldRetardHours: 12,
+        bakeCoveredMins: 20,
+        bakeUncoveredMins: 20,
+        bakeTempC: 250
+    });
+
+    // Starter state is now hardcoded in handleSave as per instruction
+    // const [starter] = useState<StarterHealth>({
+    //     peakStatus: 'Peak',
+    //     feedingRatio: '1:2:2'
+    // });
+
+    const [ratings, setRatings] = useState<LoafRatings>(initialData?.ratings || {
+        crumb: 0,
+        crust: 0,
+        ovenSpring: 0,
+        flavor: 0,
+        overall: 0
+    });
+    const [notes, setNotes] = useState(initialData?.notes || '');
+
+    const handleSave = async () => {
+        if (!name.trim()) {
+            alert('Please provide a name for this loaf.');
+            return;
+        }
+
+        const loafData: Partial<LoafRecord> = {
+            name,
+            math: mathData, // Use mathData here
+            flours,
+            timeline,
+            starter: { peakStatus: 'Peak', feedingRatio: '1:1:1' }, // Hardcoded as per instruction
+            ratings,
+            notes,
+            images
+        };
+
+        try {
+            if (editId) {
+                await updateLoaf(editId, loafData);
+            } else {
+                const newLoaf: LoafRecord = {
+                    id: crypto.randomUUID(),
+                    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    createdAt: Date.now(),
+                    ...loafData
+                } as LoafRecord;
+                await addLoaf(newLoaf);
+            }
+            onComplete();
+        } catch (e) {
+            console.error(e);
+            alert("Failed to save loaf. Check console.");
+        }
+    };
+
+    const updateTimeline = (field: keyof FermentationTimeline, val: number) => {
+        setTimeline(prev => ({ ...prev, [field]: val }));
+    };
+
+    const updateRating = (field: keyof LoafRatings, val: number) => {
+        setRatings(prev => {
+            const next = { ...prev, [field]: val };
+            // Auto-calculate overall as average
+            next.overall = Math.round((next.crumb + next.crust + next.ovenSpring + next.flavor) / 4);
+            return next;
+        });
+    };
+
+    return (
+        <div className="space-y-12 max-w-2xl mx-auto">
+            <BakersMath data={mathData} onChange={setMathData} />
+
+            <div className="glass-card p-8 sm:p-12 rounded-[2.5rem] relative overflow-hidden">
+                <h3 className="text-3xl font-serif font-bold text-ink-main mb-10 relative z-10 flex items-center gap-3">
+                    <BookOpen className="w-7 h-7 text-crust" />
+                    Journal Entry
+                </h3>
+
+                <div className="space-y-10 relative z-10">
+                    {/* Basic Info */}
+                    <div>
+                        <label className="block text-sm font-bold text-ink-muted mb-3 uppercase tracking-wider text-xs">Loaf Name</label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="e.g. Rainy Day Rye"
+                            className="w-full bg-journal-bg/50 border-2 border-transparent border-b-journal-border rounded-t-2xl px-5 py-5 text-ink-main text-xl focus:outline-none focus:bg-white dark:focus:bg-journal-card focus:border-b-crust focus:border-2 transition-all placeholder:text-ink-faint font-serif"
+                        />
+                    </div>
+
+                    <ImageUploader images={images} onChange={setImages} maxUploads={4} />
+
+                    {/* Timeline & Temperature section */}
+                    <div className="bg-journal-bg/30 p-6 rounded-2xl border border-journal-border">
+                        <h4 className="font-serif font-bold text-lg mb-4 flex items-center gap-2">
+                            <Clock className="w-5 h-5 text-sage-dark" />
+                            Timeline & Temperature
+                        </h4>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs uppercase text-ink-muted mb-1 flex items-center gap-1"><Thermometer className="w-3 h-3 text-sage-dark" /> Room Temp (°C)</label>
+                                <input type="number" step="0.5" value={timeline.roomTempC} onChange={e => updateTimeline('roomTempC', Number(e.target.value))} className="w-full p-2 rounded-lg bg-white dark:bg-journal-card border border-journal-border" />
+                            </div>
+                            <div>
+                                <label className="block text-xs uppercase text-ink-muted mb-1 flex items-center gap-1"><Thermometer className="w-3 h-3 text-crust" /> Dough Temp (°C)</label>
+                                <input type="number" step="0.5" value={timeline.bulkDoughTempC} onChange={e => updateTimeline('bulkDoughTempC', Number(e.target.value))} className="w-full p-2 rounded-lg bg-white dark:bg-journal-card border border-journal-border" />
+                            </div>
+                            <div>
+                                <label className="block text-xs uppercase text-ink-muted mb-1">Bulk Duration (hrs)</label>
+                                <input type="number" step="0.5" value={timeline.bulkFermentationHours} onChange={e => updateTimeline('bulkFermentationHours', Number(e.target.value))} className="w-full p-2 rounded-lg bg-white dark:bg-journal-card border border-journal-border" />
+                            </div>
+                            <div>
+                                <label className="block text-xs uppercase text-ink-muted mb-1">Cold Retard (hrs)</label>
+                                <input type="number" value={timeline.coldRetardHours} onChange={e => updateTimeline('coldRetardHours', Number(e.target.value))} className="w-full p-2 rounded-lg bg-white dark:bg-journal-card border border-journal-border" />
+                            </div>
+                            <div>
+                                <label className="block text-xs uppercase text-ink-muted mb-1 flex items-center gap-1"><Target className="w-3 h-3" /> Bake Temp (°C)</label>
+                                <input type="number" value={timeline.bakeTempC} onChange={e => updateTimeline('bakeTempC', Number(e.target.value))} className="w-full p-2 rounded-lg bg-white dark:bg-journal-card border border-journal-border" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Granular Ratings */}
+                    <div>
+                        <label className="block text-sm font-bold text-ink-muted mb-4 uppercase tracking-wider text-xs">Sensory Evolution</label>
+                        <div className="space-y-3 bg-journal-bg/50 p-6 rounded-2xl border border-journal-border/50">
+                            {(['crumb', 'crust', 'ovenSpring', 'flavor'] as const).map(feature => (
+                                <div key={feature} className="flex items-center justify-between">
+                                    <span className="capitalize font-serif text-ink-main">{feature.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                    <div className="flex gap-1">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                key={star}
+                                                onClick={() => updateRating(feature, star)}
+                                                className="focus:outline-none"
+                                            >
+                                                <Star className={`w-5 h-5 ${ratings[feature] >= star ? 'text-crust fill-crust' : 'text-journal-border'}`} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-bold text-ink-muted mb-3 uppercase tracking-wider text-xs">Tasting Notes & Observations</label>
+                        <textarea
+                            rows={6}
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                            placeholder="Describe the crumb, crust, scoring, and flavor profile..."
+                            className="w-full bg-journal-bg/50 border border-journal-border rounded-3xl px-6 py-5 text-ink-main focus:outline-none focus:bg-white dark:focus:bg-journal-card focus:ring-4 focus:ring-crust/10 focus:border-crust transition-all resize-none shadow-inner text-lg leading-relaxed font-serif"
+                        ></textarea>
+                    </div>
+
+                    <div className="pt-6 border-t border-ink-main/10 flex justify-between items-center">
+                        <button type="button" onClick={onComplete} className="text-ink-muted hover:text-ink-main font-sans text-sm tracking-widest uppercase transition-colors">Cancel</button>
+                        <button
+                            type="button"
+                            onClick={handleSave}
+                            className="bg-ink-main text-journal-bg px-8 py-3 rounded-full font-serif font-bold text-lg hover:bg-crust transition-all hover:scale-105 shadow-sm"
+                        >
+                            {editId ? 'Save Changes' : 'Commit to Journal'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
