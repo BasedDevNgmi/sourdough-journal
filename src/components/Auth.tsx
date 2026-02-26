@@ -100,7 +100,7 @@ export const Auth = ({ onComplete = () => { } }: { onComplete?: () => void }) =>
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="mb-8 text-center flex flex-col items-center"
             >
-                {/* Highly Sophisticated Continuous-Line Twist/Wheat Logo */}
+                {/* Clear, Minimalist Sourdough Boule Logo */}
                 <motion.svg
                     width="56"
                     height="56"
@@ -108,12 +108,12 @@ export const Auth = ({ onComplete = () => { } }: { onComplete?: () => void }) =>
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     className="mb-5 text-ink-main dark:text-[#E8E6E1]"
-                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    whileHover={{ scale: 1.05, rotate: -2 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
-                    {/* A beautifully flowing, interlocking continuous line that resembles a loaf twist and a wheat stem */}
+                    {/* The Boule Shape */}
                     <path
-                        d="M50,15 C25,15 15,35 30,55 C45,75 50,55 50,85 C50,55 55,75 70,55 C85,35 75,15 50,15 Z"
+                        d="M20,65 C10,65 15,40 30,25 C45,10 65,10 80,30 C95,50 90,65 80,65 C90,75 80,85 50,85 C20,85 10,75 20,65 Z"
                         stroke="currentColor"
                         strokeWidth="3.5"
                         strokeLinecap="round"
@@ -121,20 +121,25 @@ export const Auth = ({ onComplete = () => { } }: { onComplete?: () => void }) =>
                         fill="transparent"
                         className="drop-shadow-sm opacity-90"
                     />
+                    {/* The signature scoring (an elegant wheat stalk or leaf cut) */}
                     <path
-                        d="M50,15 C50,40 30,50 30,75 C30,85 50,85 50,85 C50,85 70,85 70,75 C70,50 50,40 50,15 Z"
+                        d="M35,45 Q50,35 65,25"
                         stroke="currentColor"
-                        strokeWidth="1.5"
+                        strokeWidth="3.5"
                         strokeLinecap="round"
-                        strokeLinejoin="round"
-                        fill="transparent"
-                        className="opacity-60"
-                        strokeDasharray="4 4"
+                        className="opacity-80"
                     />
-                    {/* Central seed/kernel drop */}
+                    <path d="M42,40 L45,35" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" className="opacity-80" />
+                    <path d="M52,33 L55,28" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" className="opacity-80" />
+
+                    {/* A smaller edge score */}
                     <path
-                        d="M50,35 C48,42 50,48 50,48 C50,48 52,42 50,35 Z"
-                        fill="currentColor"
+                        d="M25,55 Q35,65 45,60"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        className="opacity-60"
+                        strokeDasharray="6 4"
                     />
                 </motion.svg>
 
