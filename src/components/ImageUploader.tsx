@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { ImagePlus, X } from 'lucide-react';
+import { ImagePlus, X, Loader2 } from 'lucide-react';
+import imageCompression from 'browser-image-compression';
 
 interface ImageUploaderProps {
     images: string[];
@@ -9,22 +10,42 @@ interface ImageUploaderProps {
 }
 
 const ImageUploader = ({ images, onChange, maxUploads = 3 }: ImageUploaderProps) => {
-    const onDrop = useCallback((acceptedFiles: File[]) => {
-        // Convert files to base64 data URLs for persistence
-        const promises = acceptedFiles.map(file => {
-            return new Promise<string>((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result as string);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        });
+    const [isCompressing, setIsCompressing] = useState(false);
 
-        Promise.all(promises).then(newImages => {
+    const onDrop = useCallback(async (acceptedFiles: File[]) => {
+        setIsCompressing(true);
+        try {
+            const compressionOptions = {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1080,
+                useWebWorker: true,
+                fileType: 'image/jpeg' as string,
+            };
+
+            const compressedFiles = await Promise.all(
+                acceptedFiles.map(file => imageCompression(file, compressionOptions))
+            );
+
+            // Convert compressed files to base64 data URLs for persistence
+            const promises = compressedFiles.map(file => {
+                return new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            const newImages = await Promise.all(promises);
             // Append but respect max uploads
             const combined = [...images, ...newImages].slice(0, maxUploads);
             onChange(combined);
-        });
+        } catch (error) {
+            console.error("Error compressing images:", error);
+            // Fallback or toast could go here
+        } finally {
+            setIsCompressing(false);
+        }
     }, [images, onChange, maxUploads]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -72,11 +93,15 @@ const ImageUploader = ({ images, onChange, maxUploads = 3 }: ImageUploaderProps)
                 >
                     <input {...getInputProps()} />
                     <div className={`p-4 rounded-full transition-colors ${isDragActive ? 'bg-crust/10 text-crust' : 'bg-white shadow-sm text-ink-muted'}`}>
-                        <ImagePlus className="w-6 h-6" />
+                        {isCompressing ? (
+                            <Loader2 className="w-6 h-6 animate-spin text-sage-dark" />
+                        ) : (
+                            <ImagePlus className="w-6 h-6" />
+                        )}
                     </div>
                     <div>
                         <p className="font-medium text-ink-main text-sm">
-                            {isDragActive ? "Drop photos here..." : "Click to upload photos"}
+                            {isCompressing ? "Compressing dough..." : isDragActive ? "Drop photos here..." : "Click to upload photos"}
                         </p>
                         <p className="text-ink-faint text-xs mt-1">or drag and drop</p>
                     </div>

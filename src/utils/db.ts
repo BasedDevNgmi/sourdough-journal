@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie';
 import type { LoafRecord, StarterLogRecord } from '../types';
+import { isCloudSyncConfigured, syncLoafToCloud, deleteLoafFromCloud, syncStarterLogToCloud } from './supabase';
 
 export class SourdoughDatabase extends Dexie {
     loaves!: Table<LoafRecord, string>;
@@ -21,6 +22,9 @@ export const initDB = async () => db;
 
 export const saveLoaf = async (loaf: LoafRecord) => {
     await db.loaves.put(loaf);
+    if (isCloudSyncConfigured()) {
+        syncLoafToCloud(loaf).catch(e => console.warn('Background sync failed:', e));
+    }
 };
 
 export const getLoaves = async (): Promise<LoafRecord[]> => {
@@ -30,6 +34,9 @@ export const getLoaves = async (): Promise<LoafRecord[]> => {
 
 export const deleteLoaf = async (id: string) => {
     await db.loaves.delete(id);
+    if (isCloudSyncConfigured()) {
+        deleteLoafFromCloud(id).catch(e => console.warn('Background delete failed:', e));
+    }
 };
 
 export const clearDatabase = async () => {
@@ -39,6 +46,19 @@ export const clearDatabase = async () => {
 
 export const saveStarterLog = async (log: StarterLogRecord) => {
     await db.starterLogs.put(log);
+    if (isCloudSyncConfigured()) {
+        // Type conversion to ensure compatibility with Supabase helper
+        const baseLog = {
+            id: log.id,
+            createdAt: log.createdAt,
+            feedRatio: log.feedRatio,
+            starterAmountG: log.starterAmountG,
+            flourFedG: log.flourFedG,
+            waterFedG: log.waterFedG,
+            notes: log.notes
+        };
+        syncStarterLogToCloud(baseLog).catch(e => console.warn('Background sync failed:', e));
+    }
 };
 
 export const getStarterLogs = async (): Promise<StarterLogRecord[]> => {

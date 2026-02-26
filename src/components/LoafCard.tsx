@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Star, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -10,6 +11,7 @@ interface LoafCardProps {
 export const LoafCard = ({ loaf }: LoafCardProps) => {
     const rating = loaf.ratings?.overall || 0;
     const hasImage = loaf.images && loaf.images.length > 0;
+    const [imgError, setImgError] = useState(false);
 
     return (
         <Link to={`/loaf/${loaf.id}`} className="block focus:outline-none">
@@ -23,8 +25,8 @@ export const LoafCard = ({ loaf }: LoafCardProps) => {
                 <div className="flex gap-6 items-center">
                     {/* Thumbnail */}
                     <motion.div layoutId={`image-container-${loaf.id}`} className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 rounded-2xl overflow-hidden bg-journal-bg border border-journal-border flex items-center justify-center relative">
-                        {hasImage ? (
-                            <img src={loaf.images[0]} alt={loaf.name} className="w-full h-full object-cover" />
+                        {hasImage && !imgError ? (
+                            <img src={loaf.images[0]} alt={loaf.name} className="w-full h-full object-cover" onError={() => setImgError(true)} />
                         ) : (
                             <div className="text-ink-faint flex flex-col items-center">
                                 <ImageIcon className="w-8 h-8 opacity-20" strokeWidth={1} />

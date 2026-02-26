@@ -70,4 +70,16 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'framer-motion': ['framer-motion'],
+          'lucide-react': ['lucide-react'],
+          'supabase': ['@supabase/supabase-js'],
+          'dexie': ['dexie', 'dexie-react-hooks']
+        }
+      }
+    }
+  }
 })

@@ -1,3 +1,4 @@
+import { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Star, Clock, Thermometer, Target, Droplets, Wheat, Beaker } from 'lucide-react';
@@ -14,13 +15,21 @@ export const LoafDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const loaves = useJournalStore(state => state.loaves);
-    const loaf = loaves.find(l => l.id === id);
+    const currentLoaf = loaves.find(l => l.id === id);
+
+    // Cache the loaf so that the Framer Motion exit animation doesn't crash 
+    // when the loaf is abruptly removed from the global store before animating out
+    const loafRef = useRef(currentLoaf);
+    if (currentLoaf) loafRef.current = currentLoaf;
+
+    const loaf = currentLoaf || loafRef.current;
 
     if (!loaf) {
         return <div className="text-center py-20 font-serif text-ink-muted">Loaf not found in the archives.</div>;
     }
 
     const hasImage = loaf.images && loaf.images.length > 0;
+    const [imgError, setImgError] = useState(false);
 
     return (
         <motion.div
@@ -38,16 +47,50 @@ export const LoafDetail = () => {
             <motion.div layoutId={`card-${loaf.id}`} className="bg-white dark:bg-journal-card rounded-[3rem] overflow-hidden shadow-float relative border border-journal-border">
 
                 {/* Hero Header Area */}
-                {hasImage && (
-                    <motion.div layoutId={`image-container-${loaf.id}`} className="w-full h-[40vh] sm:h-[50vh] relative">
-                        <img src={loaf.images[0]} alt={loaf.name} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    </motion.div>
-                )}
+                {hasImage && !imgError ? (
+                    <div className="w-full h-[50vh] sm:h-[60vh] relative flex flex-col justify-end p-8 sm:p-16 pb-12">
+                        <motion.div layoutId={`image-container-${loaf.id}`} className="absolute inset-0">
+                            <img src={loaf.images[0]} alt={loaf.name} className="w-full h-full object-cover" onError={() => setImgError(true)} />
+                            <div className="absolute inset-0 bg-gradient-to-t from-journal-bg via-journal-bg/60 dark:from-journal-card dark:via-journal-card/80 to-transparent/20" />
+                        </motion.div>
 
-                <div className={`p-8 sm:p-16 ${hasImage ? '-mt-24 relative z-10' : ''}`}>
-                    <div className="mb-12 border-b border-ink-main/10 pb-12 relative group">
-                        <div className="absolute top-0 right-0 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="relative z-10 w-full flex flex-col group">
+                            <div className="absolute top-0 right-0 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity -mt-16 sm:-mt-20">
+                                <button onClick={() => navigate('/log', { state: { editId: loaf.id, initialData: loaf } })} className="p-2 bg-journal-bg dark:bg-journal-card border border-journal-border rounded-lg text-ink-muted hover:text-ink-main hover:bg-white dark:hover:bg-journal-bg/80 transition-colors" title="Edit Entry">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                </button>
+                                <button onClick={() => navigate('/log', { state: { iterateId: loaf.id, initialData: loaf } })} className="p-2 bg-journal-bg dark:bg-journal-card border border-journal-border rounded-lg text-ink-muted hover:text-ink-main hover:bg-white dark:hover:bg-journal-bg/80 transition-colors" title="Iterate Recipe">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 3h5v5"></path><path d="M8 3H3v5"></path><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"></path><path d="m15 9 6-6"></path></svg>
+                                </button>
+                                <button onClick={async () => {
+                                    if (window.confirm("Are you sure you want to remove this loaf from the archives?")) {
+                                        await useJournalStore.getState().removeLoaf(loaf.id);
+                                        navigate('/');
+                                    }
+                                }} className="p-2 bg-journal-bg dark:bg-journal-card border border-journal-border rounded-lg text-ink-muted hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors" title="Delete Entry">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                                </button>
+                            </div>
+
+                            <motion.span layoutId={`date-${loaf.id}`} className="block text-sm font-sans font-semibold tracking-widest uppercase mb-4 text-ink-main/80 dark:text-white/80">
+                                {loaf.date}
+                            </motion.span>
+                            <motion.h1 layoutId={`title-${loaf.id}`} className="text-5xl sm:text-7xl font-serif font-bold tracking-tighter leading-none mb-6 text-ink-main dark:text-white drop-shadow-md">
+                                {loaf.name}
+                            </motion.h1>
+
+                            <div className="flex bg-journal-bg/80 backdrop-blur-sm self-start inline-flex p-3 rounded-2xl border border-journal-border shadow-sm">
+                                <motion.div layoutId={`rating-${loaf.id}`} className="flex gap-1.5">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star key={i} className={`w-6 h-6 ${i < (loaf.ratings?.overall || 0) ? 'text-crust fill-crust drop-shadow-sm' : 'text-ink-main/10'}`} />
+                                    ))}
+                                </motion.div>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="p-8 sm:p-16 pb-12 dark:bg-journal-card relative group border-b border-ink-main/10">
+                        <div className="absolute top-8 right-8 sm:top-16 sm:right-16 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button onClick={() => navigate('/log', { state: { editId: loaf.id, initialData: loaf } })} className="p-2 bg-journal-bg dark:bg-journal-card border border-journal-border rounded-lg text-ink-muted hover:text-ink-main hover:bg-white dark:hover:bg-journal-bg/80 transition-colors" title="Edit Entry">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                             </button>
@@ -63,10 +106,10 @@ export const LoafDetail = () => {
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
                             </button>
                         </div>
-                        <motion.span layoutId={`date-${loaf.id}`} className={`block text-sm font-sans font-semibold tracking-widest uppercase mb-4 ${hasImage ? 'text-white/80' : 'text-sage-dark'}`}>
+                        <motion.span layoutId={`date-${loaf.id}`} className="block text-sm font-sans font-semibold tracking-widest uppercase mb-4 text-sage-dark">
                             {loaf.date}
                         </motion.span>
-                        <motion.h1 layoutId={`title-${loaf.id}`} className={`text-5xl sm:text-7xl font-serif font-bold tracking-tighter leading-none mb-6 ${hasImage ? 'text-white drop-shadow-md' : 'text-ink-main'}`}>
+                        <motion.h1 layoutId={`title-${loaf.id}`} className="text-5xl sm:text-7xl font-serif font-bold tracking-tighter leading-none mb-6 text-ink-main">
                             {loaf.name}
                         </motion.h1>
 
@@ -78,7 +121,9 @@ export const LoafDetail = () => {
                             </motion.div>
                         </div>
                     </div>
+                )}
 
+                <div className="p-8 sm:p-16 pt-8 sm:pt-12">
                     {/* Baker's Formula Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-16">
                         <div className="p-5 bg-journal-bg rounded-2xl border border-journal-border text-center">

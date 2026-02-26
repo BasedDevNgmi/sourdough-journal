@@ -174,7 +174,7 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-white border border-journal-border shadow-subtle;
+    @apply bg-white dark:bg-journal-card border border-journal-border shadow-subtle;
     /* Removing heavy blurs for a crisp, printed paper feel */
   }
 

@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Download, Upload, FlaskConical } from 'lucide-react';
-import { exportDatabase, importDatabase, saveStarterLog } from '../utils/db';
+import { exportDatabase, importDatabase, saveStarterLog, saveLoaf } from '../utils/db';
+import { isCloudSyncConfigured, fetchAllCloudLoaves, fetchAllCloudStarterLogs } from '../utils/supabase';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useToastStore } from '../store/useToastStore';
+import { useAuthStore } from '../store/useAuthStore';
 import type { ThemeColor, ThemeMode } from '../store/useSettingsStore';
 
 const pageTransition = {
@@ -15,10 +17,12 @@ const pageTransition = {
 
 export const Settings = () => {
     const { bakerName, setBakerName, themeColor, setThemeColor, themeMode, setThemeMode } = useSettingsStore();
+    const { session, signOut } = useAuthStore();
     const { addToast, addConfirm } = useToastStore();
 
     const [starterRatio, setStarterRatio] = useState('1:1:1');
     const [starterAmount, setStarterAmount] = useState(25);
+    const [isSyncing, setIsSyncing] = useState(false);
 
     const themes: { id: ThemeColor, name: string }[] = [
         { id: 'original', name: 'Tartine Classic (Charcoal)' },
@@ -189,6 +193,68 @@ export const Settings = () => {
                                 Import Archives
                             </div>
                         </div>
+                    </div>
+
+                    <div className="mt-8">
+                        <label className="block text-sm font-bold text-ink-muted mb-4 uppercase tracking-wider text-xs flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-sage-dark animate-pulse" />
+                            Cloud Sync
+                        </label>
+                        {!isCloudSyncConfigured() ? (
+                            <div className="bg-journal-bg/50 dark:bg-journal-card border border-journal-border p-5 rounded-2xl text-center">
+                                <p className="text-sm font-sans text-ink-muted mb-3">Supabase credentials are not configured.</p>
+                                <p className="text-xs text-ink-faint">Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to .env.local</p>
+                            </div>
+                        ) : !session ? (
+                            <div className="bg-journal-bg/50 dark:bg-journal-card border border-journal-border p-5 rounded-2xl text-center text-ink-muted text-sm font-sans block">
+                                Authentication lost. Please refresh the page to sign in again.
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between p-4 bg-sage/5 border border-sage/20 rounded-2xl">
+                                    <p className="text-sm font-sans text-sage-dark dark:text-sage flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-sage-dark animate-pulse" />
+                                        Authenticated as <b>{session.user.email}</b>
+                                    </p>
+                                    <button
+                                        onClick={async () => {
+                                            await signOut();
+                                            addToast("Signed out from the cloud.", "success");
+                                        }}
+                                        className="text-xs font-bold uppercase tracking-wider text-sage-dark hover:text-ink-main transition-colors"
+                                    >
+                                        Sign Out
+                                    </button>
+                                </div>
+                                <button
+                                    onClick={async () => {
+                                        setIsSyncing(true);
+                                        try {
+                                            const [cloudLoaves, cloudLogs] = await Promise.all([
+                                                fetchAllCloudLoaves(),
+                                                fetchAllCloudStarterLogs()
+                                            ]);
+                                            for (const l of cloudLoaves) await saveLoaf(l);
+                                            for (const sl of cloudLogs) await saveStarterLog(sl);
+
+                                            const { useJournalStore } = await import('../store/useJournalStore');
+                                            await useJournalStore.getState().loadLoaves();
+
+                                            addToast(`Synced ${cloudLoaves.length} loaves from cloud.`, 'success');
+                                        } catch (err: any) {
+                                            console.error(err);
+                                            addToast(err.message || 'Sync failed', 'error');
+                                        } finally {
+                                            setIsSyncing(false);
+                                        }
+                                    }}
+                                    disabled={isSyncing}
+                                    className="w-full py-4 rounded-2xl border-2 border-sage text-sage-dark dark:text-sage-light hover:bg-sage/10 transition-all font-serif font-bold tracking-wide shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                                >
+                                    {isSyncing ? "Syncing..." : "Sync from Cloud"}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
 
