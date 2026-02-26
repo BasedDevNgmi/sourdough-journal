@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../utils/supabase';
-import { Mail, Lock, KeyRound, Sparkles, AlertCircle } from 'lucide-react';
+import { Mail, KeyRound, Sparkles, AlertCircle } from 'lucide-react';
 import { useToastStore } from '../store/useToastStore';
 
 type AuthMode = 'signin' | 'signup' | 'magiclink' | 'forgotpassword';
@@ -155,15 +155,12 @@ export const Auth = ({ onComplete = () => { } }: { onComplete?: () => void }) =>
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ type: "spring", bounce: 0.3, delay: 0.2 }}
-                className="w-full bg-white/60 dark:bg-journal-card/80 backdrop-blur-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-[2.5rem] p-6 sm:p-10 relative overflow-hidden"
+                className="w-full bg-white/60 dark:bg-journal-card/80 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-[2.5rem] p-6 sm:p-10 relative overflow-hidden"
             >
 
                 <div className="relative z-10">
                     <div className="text-center mb-10">
-                        <div className="w-16 h-16 bg-sage-light dark:bg-journal-bg rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-subtle border border-journal-border">
-                            <Lock className="w-8 h-8 text-sage-dark dark:text-sage" />
-                        </div>
-                        <h2 className="text-3xl font-serif font-bold text-ink-main dark:text-white mb-3">
+                        <h2 className="text-3xl font-serif font-bold text-ink-main dark:text-white mb-3 mt-2">
                             {getModeTitle()}
                         </h2>
                         <p className="text-sm font-sans text-ink-muted">

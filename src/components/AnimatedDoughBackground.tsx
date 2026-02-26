@@ -2,11 +2,12 @@ import { motion } from 'framer-motion';
 
 export const AnimatedDoughBackground = () => {
     return (
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-journal-bg dark:bg-[#1C1B19]">
-            {/* Base gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-journal-bg via-sage/5 to-amber-900/10 dark:from-[#1C1B19] dark:via-sage-dark/10 dark:to-orange-900/20" />
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-journal-bg dark:bg-[#1C1B19] flex items-center justify-center will-change-transform">
+            {/* Base static background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-journal-bg via-sage/10 to-amber-900/10 dark:from-[#1C1B19] dark:via-sage-dark/10 dark:to-orange-900/20" />
 
             {/* Glowing orb 1 (Warm Dough) */}
+            {/* We replaced mix-blend modes and huge CSS blurs with native CSS radial gradients which render instantly on GPU */}
             <motion.div
                 animate={{
                     scale: [1, 1.2, 0.9, 1],
@@ -20,7 +21,8 @@ export const AnimatedDoughBackground = () => {
                     repeat: Infinity,
                     ease: "easeInOut"
                 }}
-                className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-amber-200/40 dark:bg-amber-700/20 mix-blend-multiply dark:mix-blend-screen blur-[80px]"
+                className="absolute w-[60vw] h-[60vw] sm:w-[50vw] sm:h-[50vw] -top-[10%] -left-[10%] opacity-40 dark:opacity-20 will-change-transform"
+                style={{ background: 'radial-gradient(circle, rgba(253,230,138,1) 0%, rgba(253,230,138,0) 70%)' }}
             />
 
             {/* Glowing orb 2 (Starter Bubbles) */}
@@ -38,7 +40,8 @@ export const AnimatedDoughBackground = () => {
                     ease: "easeInOut",
                     delay: 2
                 }}
-                className="absolute top-[10%] -right-[10%] w-[70%] h-[70%] bg-orange-200/30 dark:bg-orange-800/20 mix-blend-multiply dark:mix-blend-screen blur-[100px]"
+                className="absolute w-[70vw] h-[70vw] sm:w-[60vw] sm:h-[60vw] top-[5%] -right-[15%] opacity-30 dark:opacity-20 will-change-transform"
+                style={{ background: 'radial-gradient(circle, rgba(254,215,170,1) 0%, rgba(254,215,170,0) 70%)' }}
             />
 
             {/* Glowing orb 3 (Sage / Flour dusting) */}
@@ -56,11 +59,12 @@ export const AnimatedDoughBackground = () => {
                     ease: "easeInOut",
                     delay: 4
                 }}
-                className="absolute -bottom-[20%] left-[20%] w-[80%] h-[80%] bg-sage-light/40 dark:bg-sage-dark/20 mix-blend-multiply dark:mix-blend-screen blur-[120px]"
+                className="absolute w-[80vw] h-[80vw] sm:w-[70vw] sm:h-[70vw] -bottom-[10%] right-[10%] opacity-40 dark:opacity-20 will-change-transform"
+                style={{ background: 'radial-gradient(circle, rgba(167,184,168,1) 0%, rgba(167,184,168,0) 70%)' }}
             />
 
             {/* Noise texture overlay for that floury feel */}
-            <div className="absolute inset-0 texture-overlay opacity-50 mix-blend-overlay" />
+            <div className="absolute inset-0 texture-overlay opacity-[0.15] dark:opacity-30 mix-blend-overlay pointer-events-none" />
         </div>
     );
 };
