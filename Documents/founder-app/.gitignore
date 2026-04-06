@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment (never commit real values)
+.env.local
+.env.*.local
+
+# Editor
+.DS_Store
+*.swp
+*.swo
+
+# Vite
+.vite/
